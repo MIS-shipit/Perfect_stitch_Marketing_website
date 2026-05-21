@@ -61,7 +61,19 @@ async function main() {
     color: { dark: "#07080A", light: "#FFFFFF" },
   });
 
-  console.log("Generated mockup placeholders and QR codes.");
+  const repoLogo = path.join(root, "..", "Logo");
+  const markSrc = path.join(repoLogo, "1x", "Forground1x.png");
+  if (fs.existsSync(markSrc)) {
+    fs.copyFileSync(markSrc, path.join(logoDir, "mark.png"));
+    fs.copyFileSync(markSrc, path.join(root, "src", "app", "icon.png"));
+    fs.copyFileSync(markSrc, path.join(root, "src", "app", "apple-icon.png"));
+    const bgSvg = path.join(repoLogo, "SVG", "Background.svg");
+    if (fs.existsSync(bgSvg)) {
+      fs.copyFileSync(bgSvg, path.join(logoDir, "logo-bg.svg"));
+    }
+  }
+
+  console.log("Generated mockup placeholders, QR codes, and logos.");
 }
 
 main().catch((err) => {

@@ -58,7 +58,7 @@ export default function Provider({ showcaseSteps, cards }: ProviderProps) {
           </motion.h2>
         </motion.div>
 
-        <div className="mt-12">
+        <div className="mt-12 mb-4 md:mb-6">
           <ImageShowcaseCard
             eyebrow="The provider app"
             marketingTitle="Everything your shop needs, even offline."

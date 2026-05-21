@@ -208,6 +208,7 @@ export default function Hero({
 
   return (
     <section
+      id="hero"
       ref={sectionRef}
       className="relative flex min-h-[calc(100svh-4rem)] items-center overflow-hidden bg-canvas py-24"
       aria-labelledby="hero-headline"

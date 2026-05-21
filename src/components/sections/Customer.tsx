@@ -58,7 +58,7 @@ export default function Customer({ showcaseSteps, cards }: CustomerProps) {
           </motion.h2>
         </motion.div>
 
-        <div className="mt-12">
+        <div className="mt-12 mb-4 md:mb-6">
           <ImageShowcaseCard
             eyebrow="The customer app"
             marketingTitle="One app for every step of your laundry & tailoring journey."

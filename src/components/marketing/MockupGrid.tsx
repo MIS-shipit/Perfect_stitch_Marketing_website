@@ -149,7 +149,7 @@ export default function MockupGrid({ items, tones }: MockupGridProps) {
 
   return (
     <motion.div
-      className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:gap-8"
+      className="mt-24 grid grid-cols-1 gap-5 sm:mt-28 sm:grid-cols-2 sm:gap-6 lg:mt-32 lg:gap-8"
       variants={motionEnabled ? stagger(0.1) : undefined}
       initial={motionEnabled ? "initial" : false}
       whileInView={motionEnabled ? "animate" : undefined}

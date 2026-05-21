@@ -1,10 +1,21 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { ChevronRightIcon, MenuIcon } from "lucide-react";
+import { useState } from "react";
+import {
+  ChevronRightIcon,
+  Info,
+  LayoutGrid,
+  Mail,
+  MenuIcon,
+  Sparkles,
+  Store,
+  Users,
+} from "lucide-react";
 import Container from "@/components/site/Container";
+import BrandLogo from "@/components/site/BrandLogo";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -14,22 +25,26 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/cn";
-import { useActiveSection } from "./useActiveSection";
+import {
+  useNavScrollState,
+  type ScrollSectionId,
+} from "./useNavScrollState";
 
-const SCROLL_SECTION_IDS = ["services", "customer", "provider", "download"] as const;
-
-type ScrollSectionId = (typeof SCROLL_SECTION_IDS)[number];
-
-const NAV_LINKS: {
+type NavItem = {
   label: string;
+  icon: React.ComponentType<{ className?: string }>;
   sectionId?: ScrollSectionId;
   href?: string;
-}[] = [
-  { label: "Services", sectionId: "services" },
-  { label: "Customer", sectionId: "customer" },
-  { label: "Provider", sectionId: "provider" },
-  { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
+  home?: boolean;
+};
+
+const NAV_LINKS: NavItem[] = [
+  { label: "Home", href: "/", icon: Sparkles, home: true },
+  { label: "Services", sectionId: "services", icon: LayoutGrid },
+  { label: "Customer", sectionId: "customer", icon: Users },
+  { label: "Provider", sectionId: "provider", icon: Store },
+  { label: "About", href: "/about", icon: Info },
+  { label: "Contact", href: "/contact", icon: Mail },
 ];
 
 const focusRing =
@@ -37,47 +52,6 @@ const focusRing =
 
 function sectionHref(sectionId: string, pathname: string) {
   return pathname === "/" ? `#${sectionId}` : `/#${sectionId}`;
-}
-
-function SVGLogo() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="shrink-0"
-      aria-hidden="true"
-    >
-      {/* Needle body */}
-      <path
-        d="M10 2L10 14"
-        stroke="#14B8B8"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      {/* Needle eye */}
-      <ellipse
-        cx="10"
-        cy="2.5"
-        rx="1.2"
-        ry="0.8"
-        stroke="#14B8B8"
-        strokeWidth="0.8"
-      />
-      {/* Thread */}
-      <path
-        d="M9.5 2C7 3 6 6 8 8C10 10 9 13 7 14"
-        stroke="#14B8B8"
-        strokeWidth="0.8"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* Thread end dot */}
-      <circle cx="7" cy="14" r="0.8" fill="#14B8B8" />
-    </svg>
-  );
 }
 
 function NavLink({
@@ -111,147 +85,298 @@ function NavLink({
   );
 }
 
+function CompactNavItem({
+  item,
+  href,
+  isActive,
+  pathname,
+}: {
+  item: NavItem;
+  href: string;
+  isActive: boolean;
+  pathname: string;
+}) {
+  const Icon = item.icon;
+
+  if (item.home) {
+    return (
+      <Link
+        href="/"
+        aria-label="Perfect Stitch home"
+        aria-current={pathname === "/" ? "page" : undefined}
+        className={cn(
+          focusRing,
+          "flex shrink-0 items-center justify-center rounded-xl px-2 py-2 transition-colors hover:bg-white/5",
+          isActive && "bg-white/8",
+        )}
+      >
+        <Image
+          src="/logo/mark.png"
+          alt=""
+          width={32}
+          height={32}
+          className="size-8 rounded-lg"
+        />
+      </Link>
+    );
+  }
+
+  return (
+    <Link
+      href={href}
+      aria-current={isActive ? "location" : undefined}
+      className={cn(
+        focusRing,
+        "flex min-w-[3.25rem] flex-col items-center gap-1 rounded-xl px-2 py-2 transition-colors hover:bg-white/5",
+        isActive && "bg-primary/10 text-primary",
+      )}
+    >
+      <Icon
+        className={cn(
+          "size-5 shrink-0",
+          isActive ? "text-primary" : "text-ink",
+        )}
+      />
+      <span
+        className={cn(
+          "text-[10px] font-medium leading-none",
+          isActive ? "text-primary" : "text-body",
+        )}
+      >
+        {item.label}
+      </span>
+    </Link>
+  );
+}
+
 export default function Nav() {
   const pathname = usePathname();
-  const activeSection = useActiveSection([...SCROLL_SECTION_IDS]);
-  const [scrolled, setScrolled] = useState(false);
+  const { compact, activeSection } = useNavScrollState(pathname);
   const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   const downloadHref = sectionHref("download", pathname);
 
+  const resolveActive = (item: NavItem) => {
+    if (item.home) return pathname === "/" && !compact;
+    if (item.href) return pathname === item.href;
+    return (
+      pathname === "/" && compact && activeSection === item.sectionId
+    );
+  };
+
   return (
-    <header className="sticky top-0 z-50 flex h-16 items-center">
-      <Container className="flex w-full items-center gap-4">
-        <div
+    <header
+      className={cn(
+        "z-50 flex items-center transition-all duration-500 ease-out",
+        compact
+          ? "pointer-events-none fixed top-3 right-3 left-auto h-auto w-auto"
+          : "sticky top-0 h-16 w-full",
+      )}
+    >
+      <div
+        className={cn(
+          "pointer-events-auto transition-all duration-500 ease-out",
+          compact ? "ml-auto" : "w-full",
+        )}
+      >
+        <Container
           className={cn(
-            "flex w-full items-center gap-4 rounded-full px-4 transition-all duration-300",
-            scrolled
-              ? "border border-hairline bg-surface/85 py-2 shadow-[0_2px_24px_rgb(0_0_0/0.4)] backdrop-blur-md"
-              : "border border-transparent bg-transparent py-0",
+            "flex items-center transition-all duration-500 ease-out",
+            compact ? "w-auto max-w-none px-0" : "w-full gap-4",
           )}
         >
-        <Link
-          href="/"
-          className={cn(
-            focusRing,
-            "flex shrink-0 items-center gap-2 text-sm font-semibold tracking-tight text-ink",
-          )}
-        >
-          <SVGLogo />
-          Perfect Stitch
-        </Link>
-
-        <nav
-          className="hidden flex-1 items-center justify-center gap-1 md:flex"
-          aria-label="Primary"
-        >
-          {NAV_LINKS.map((item) => {
-            if (item.href) {
-              return (
-                <NavLink
-                  key={item.label}
-                  href={item.href}
-                  isActive={pathname === item.href}
-                >
-                  {item.label}
-                </NavLink>
-              );
-            }
-
-            const href = sectionHref(item.sectionId!, pathname);
-            const isActive =
-              pathname === "/" && activeSection === item.sectionId;
-
-            return (
-              <NavLink key={item.label} href={href} isActive={isActive}>
-                {item.label}
-              </NavLink>
-            );
-          })}
-        </nav>
-
-        <div className="ml-auto flex items-center gap-2">
-          <Link
-            href={downloadHref}
+          <div
             className={cn(
-              focusRing,
-              "relative inline-flex h-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover",
-              "before:pointer-events-none before:absolute before:inset-0 before:-translate-x-full before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:transition-transform before:duration-500 hover:before:translate-x-full",
+              "nav-glass flex items-center transition-all duration-500 ease-out",
+              compact
+                ? "gap-0.5 rounded-full px-2 py-2"
+                : "w-full gap-4 rounded-full px-4 py-2",
             )}
           >
-            Download
-          </Link>
-
-          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-            <SheetTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className={cn("md:hidden", focusRing)}
-                  aria-label="Open menu"
-                />
-              }
-            >
-              <MenuIcon className="size-5 text-ink" />
-            </SheetTrigger>
-            <SheetContent
-              side="right"
-              className="border-hairline bg-surface-elevated"
-            >
-              <SheetHeader>
-                <SheetTitle className="flex items-center gap-2 text-ink">
-                  <SVGLogo />
-                  Perfect Stitch
-                </SheetTitle>
-              </SheetHeader>
-              <nav className="flex flex-col gap-1 px-4 pb-6" aria-label="Mobile">
-                {NAV_LINKS.map((item) => {
-                  if (item.href) {
+            {compact ? (
+              <>
+                <nav
+                  className="hidden items-center gap-0.5 md:flex"
+                  aria-label="Primary compact"
+                >
+                  {NAV_LINKS.map((item) => {
+                    const href = item.href ?? sectionHref(item.sectionId!, pathname);
                     return (
-                      <NavLink
+                      <CompactNavItem
                         key={item.label}
-                        href={item.href}
-                        isActive={pathname === item.href}
-                        className="flex w-full items-center justify-between px-0"
-                        onNavigate={() => setMenuOpen(false)}
-                      >
+                        item={item}
+                        href={href}
+                        isActive={resolveActive(item)}
+                        pathname={pathname}
+                      />
+                    );
+                  })}
+                </nav>
+                <Link
+                  href={downloadHref}
+                  className={cn(
+                    focusRing,
+                    "ml-1 hidden h-9 shrink-0 items-center justify-center rounded-full bg-primary px-3 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary-hover md:inline-flex",
+                  )}
+                >
+                  Download
+                </Link>
+                <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+                  <SheetTrigger
+                    render={
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className={cn("md:hidden", focusRing)}
+                        aria-label="Open menu"
+                      />
+                    }
+                  >
+                    <MenuIcon className="size-5 text-ink" />
+                  </SheetTrigger>
+                  <SheetContent
+                    side="right"
+                    className="border-hairline bg-surface-elevated"
+                  >
+                    <SheetHeader>
+                      <SheetTitle className="flex items-center gap-2 text-ink">
+                        <BrandLogo size="sm" />
+                      </SheetTitle>
+                    </SheetHeader>
+                    <nav className="flex flex-col gap-1 px-4 pb-6" aria-label="Mobile">
+                      {NAV_LINKS.filter((i) => !i.home).map((item) => {
+                        const href =
+                          item.href ?? sectionHref(item.sectionId!, pathname);
+                        return (
+                          <NavLink
+                            key={item.label}
+                            href={href}
+                            isActive={resolveActive(item)}
+                            className="flex w-full items-center justify-between px-0"
+                            onNavigate={() => setMenuOpen(false)}
+                          >
+                            {item.label}
+                            <ChevronRightIcon className="size-4 shrink-0 text-mute" />
+                          </NavLink>
+                        );
+                      })}
+                    </nav>
+                  </SheetContent>
+                </Sheet>
+              </>
+            ) : (
+              <>
+                <Link href="/" className={cn(focusRing, "flex shrink-0 items-center")}>
+                  <BrandLogo />
+                </Link>
+
+                <nav
+                  className="hidden flex-1 items-center justify-center gap-1 md:flex"
+                  aria-label="Primary"
+                >
+                  {NAV_LINKS.filter((i) => !i.home).map((item) => {
+                    if (item.href) {
+                      return (
+                        <NavLink
+                          key={item.label}
+                          href={item.href}
+                          isActive={pathname === item.href}
+                        >
+                          {item.label}
+                        </NavLink>
+                      );
+                    }
+
+                    const href = sectionHref(item.sectionId!, pathname);
+                    const isActive = resolveActive(item);
+
+                    return (
+                      <NavLink key={item.label} href={href} isActive={isActive}>
                         {item.label}
-                        <ChevronRightIcon className="size-4 shrink-0 text-mute" />
                       </NavLink>
                     );
-                  }
+                  })}
+                </nav>
 
-                  const href = sectionHref(item.sectionId!, pathname);
-                  const isActive =
-                    pathname === "/" && activeSection === item.sectionId;
+                <div className="ml-auto flex items-center gap-2">
+                  <Link
+                    href={downloadHref}
+                    className={cn(
+                      focusRing,
+                      "relative inline-flex h-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover",
+                      "before:pointer-events-none before:absolute before:inset-0 before:-translate-x-full before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:transition-transform before:duration-500 hover:before:translate-x-full",
+                    )}
+                  >
+                    Download
+                  </Link>
 
-                  return (
-                    <NavLink
-                      key={item.label}
-                      href={href}
-                      isActive={isActive}
-                      className="flex w-full items-center justify-between px-0"
-                      onNavigate={() => setMenuOpen(false)}
+                  <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+                    <SheetTrigger
+                      render={
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={cn("md:hidden", focusRing)}
+                          aria-label="Open menu"
+                        />
+                      }
                     >
-                      {item.label}
-                      <ChevronRightIcon className="size-4 shrink-0 text-mute" />
-                    </NavLink>
-                  );
-                })}
-              </nav>
-            </SheetContent>
-          </Sheet>
-        </div>
-        </div>
-      </Container>
+                      <MenuIcon className="size-5 text-ink" />
+                    </SheetTrigger>
+                    <SheetContent
+                      side="right"
+                      className="border-hairline bg-surface-elevated"
+                    >
+                      <SheetHeader>
+                        <SheetTitle className="flex items-center gap-2 text-ink">
+                          <BrandLogo size="sm" />
+                        </SheetTitle>
+                      </SheetHeader>
+                      <nav
+                        className="flex flex-col gap-1 px-4 pb-6"
+                        aria-label="Mobile"
+                      >
+                        {NAV_LINKS.filter((i) => !i.home).map((item) => {
+                          if (item.href) {
+                            return (
+                              <NavLink
+                                key={item.label}
+                                href={item.href}
+                                isActive={pathname === item.href}
+                                className="flex w-full items-center justify-between px-0"
+                                onNavigate={() => setMenuOpen(false)}
+                              >
+                                {item.label}
+                                <ChevronRightIcon className="size-4 shrink-0 text-mute" />
+                              </NavLink>
+                            );
+                          }
+
+                          const href = sectionHref(item.sectionId!, pathname);
+                          const isActive = resolveActive(item);
+
+                          return (
+                            <NavLink
+                              key={item.label}
+                              href={href}
+                              isActive={isActive}
+                              className="flex w-full items-center justify-between px-0"
+                              onNavigate={() => setMenuOpen(false)}
+                            >
+                              {item.label}
+                              <ChevronRightIcon className="size-4 shrink-0 text-mute" />
+                            </NavLink>
+                          );
+                        })}
+                      </nav>
+                    </SheetContent>
+                  </Sheet>
+                </div>
+              </>
+            )}
+          </div>
+        </Container>
+      </div>
     </header>
   );
 }
