@@ -1,0 +1,50 @@
+{
+  "hero": {
+    "eyebrow": "LAUNDRY + TAILORING · ON-DEMAND",
+    "headline": [
+      { "text": "Your", "teal": false },
+      { "text": "wardrobe,", "teal": false },
+      { "text": "looked", "teal": true },
+      { "text": "after.", "teal": true }
+    ],
+    "subcopy": "Order laundry or tailoring in seconds. Track every garment in real time. Pay when it's done.",
+    "cities": ["Mumbai", "Bangalore", "Chennai", "Delhi"],
+    "cityLabel": "Trusted in 12+ cities",
+    "mockups": {
+      "customer": "hero-customer",
+      "provider": "hero-provider"
+    }
+  },
+  "marquee": [
+    "Book pickup",
+    "Real-time tracking",
+    "Razorpay payments",
+    "Multi-language",
+    "Offline-first",
+    "Measurements",
+    "Order pipeline",
+    "Payouts"
+  ],
+  "mockups": {
+    "hero-customer": { "alt": "Perfect Stitch customer app" },
+    "hero-provider": { "alt": "Perfect Stitch provider app" },
+    "customer-home": { "alt": "Customer home screen", "caption": "Home — services at a glance" },
+    "customer-tracking": { "alt": "Order tracking screen", "caption": "Live order tracking" },
+    "customer-payment": { "alt": "Payment confirmation", "caption": "Razorpay-secured payment" },
+    "customer-profile": { "alt": "Profile and history screen", "caption": "Profile, addresses, history" },
+    "provider-dashboard": { "alt": "Provider dashboard", "caption": "Offline-first dashboard" },
+    "provider-pipeline": { "alt": "Order pipeline screen", "caption": "Order pipeline" },
+    "provider-measurements": { "alt": "Measurements screen", "caption": "Measurements & intake" },
+    "provider-payouts": { "alt": "Payouts screen", "caption": "Payouts & earnings" }
+  },
+  "about": {
+    "team": [
+      { "name": "Arjun Shah", "handle": "@arjunshah", "role": "Co-founder & CEO", "city": "Mumbai", "avatar": "arjun" },
+      { "name": "Priya Nair", "handle": "@priyanair", "role": "Head of Design", "city": "Bangalore", "avatar": "priya" },
+      { "name": "Rohit Verma", "handle": "@rohitverma", "role": "Lead Engineer", "city": "Delhi", "avatar": "rohit" },
+      { "name": "Ananya Rao", "handle": "@ananyarao", "role": "Operations", "city": "Chennai", "avatar": "ananya" },
+      { "name": "Vikram Singh", "handle": "@vikramsingh", "role": "Growth", "city": "Mumbai", "avatar": "vikram" },
+      { "name": "Kavita Joseph", "handle": "@kavitajoseph", "role": "Customer Success", "city": "Bangalore", "avatar": "kavita" }
+    ]
+  }
+}

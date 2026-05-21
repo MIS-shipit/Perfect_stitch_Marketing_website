@@ -27,9 +27,9 @@ function slotClass(distance: number) {
     return "z-10 scale-100 opacity-100 blur-0 pointer-events-auto";
   }
   if (distance === 1) {
-    return "z-[5] scale-90 opacity-45 blur-[1.5px] pointer-events-auto";
+    return "z-[5] scale-[0.96] opacity-95 blur-0 pointer-events-auto";
   }
-  return "z-[1] scale-[0.82] opacity-15 blur-[3px] pointer-events-none";
+  return "z-[1] scale-[0.9] opacity-55 blur-0 pointer-events-none";
 }
 
 export default function TeamCarousel({ members }: TeamCarouselProps) {
@@ -69,11 +69,11 @@ export default function TeamCarousel({ members }: TeamCarouselProps) {
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 left-0 z-20 w-40 bg-gradient-to-r from-canvas to-transparent"
+        className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r from-canvas to-transparent sm:w-24"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 z-20 w-40 bg-gradient-to-l from-canvas to-transparent"
+        className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-gradient-to-l from-canvas to-transparent sm:w-24"
       />
 
       {mounted && containerW > 0 ? (
@@ -139,13 +139,19 @@ function TeamCard({
         slotClass(distance),
         isCenter
           ? "cursor-default border-hairline-strong bg-surface-card shadow-[0_24px_60px_-20px_rgb(20_184_184/0.3)] ring-1 ring-primary/20"
-          : "cursor-pointer border-transparent bg-transparent hover:border-hairline",
+          : distance === 1
+            ? "cursor-pointer border-hairline-strong/70 bg-surface-card/90 shadow-[0_12px_40px_-20px_rgb(20_184_184/0.35)] hover:border-primary/25"
+            : "cursor-pointer border-hairline/50 bg-surface/70 hover:border-hairline",
       )}
     >
       <div
         className={cn(
           "relative shrink-0 overflow-hidden rounded-full border transition-all duration-500",
-          isCenter ? "size-12 border-primary/30" : "size-10 border-hairline",
+          isCenter
+            ? "size-12 border-primary/30"
+            : distance === 1
+              ? "size-11 border-hairline-strong"
+              : "size-10 border-hairline",
         )}
       >
         <Image
@@ -158,16 +164,27 @@ function TeamCard({
       </div>
 
       <div className="flex min-w-0 flex-col gap-0.5">
-        {isCenter ? (
+        {distance <= 1 ? (
           <>
             <div className="flex items-center gap-1.5">
-              <span className="text-sm font-semibold text-ink">{m.name}</span>
-              <span className="text-xs text-mute">{m.handle}</span>
+              <span
+                className={cn(
+                  "text-sm font-semibold",
+                  isCenter ? "text-ink" : "text-body",
+                )}
+              >
+                {m.name}
+              </span>
+              {isCenter ? (
+                <span className="text-xs text-mute">{m.handle}</span>
+              ) : null}
             </div>
-            <span className="text-xs text-body">{m.role}</span>
+            <span className={cn("text-xs", isCenter ? "text-body" : "text-mute")}>
+              {m.role}
+            </span>
           </>
         ) : (
-          <div className="h-8 w-[140px]" aria-hidden />
+          <span className="text-xs text-mute">{m.name}</span>
         )}
       </div>
     </div>

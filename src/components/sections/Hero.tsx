@@ -16,23 +16,13 @@ import Eyebrow from "@/components/site/Eyebrow";
 import Container from "@/components/site/Container";
 import { cn } from "@/lib/cn";
 import { EASE, fadeUp, stagger, wordReveal } from "@/lib/motion";
-
-const HERO_CUSTOMER = "/mockups/_placeholder/hero-customer.png";
-const HERO_PROVIDER = "/mockups/_placeholder/hero-provider.png";
-
-const CITY_CHIPS = ["Mumbai", "Bangalore", "Chennai", "Delhi"];
+import type { HeroContentProps } from "@/lib/content/hero-props";
+import NeonBorder from "@/components/ui/NeonBorder";
 
 const FLOAT_ANIMATION = {
   y: [0, -6, 0],
   transition: { duration: 6, repeat: Infinity, ease: "easeInOut" as const },
 };
-
-const HEADLINE_WORDS: { text: string; teal: boolean }[] = [
-  { text: "Your", teal: false },
-  { text: "wardrobe,", teal: false },
-  { text: "looked", teal: true },
-  { text: "after.", teal: true },
-];
 
 const SPRING = { stiffness: 120, damping: 22, mass: 0.4 };
 
@@ -148,7 +138,17 @@ function HeroPhone({
   );
 }
 
-export default function Hero() {
+export default function Hero({
+  eyebrow,
+  headline,
+  subcopy,
+  cities,
+  cityLabel,
+  customerSrc,
+  providerSrc,
+  customerAlt,
+  providerAlt,
+}: HeroContentProps) {
   const { entrance, motionEnabled, ready } = useMotionReady();
   const enhancedMotion = ready && motionEnabled;
   const sectionRef = useRef<HTMLElement>(null);
@@ -290,7 +290,7 @@ export default function Hero() {
             }
           >
             <motion.div variants={entrance ? fadeUp : undefined}>
-              <Eyebrow>LAUNDRY + TAILORING · ON-DEMAND</Eyebrow>
+              <Eyebrow>{eyebrow}</Eyebrow>
             </motion.div>
 
             {!entrance ? (
@@ -298,8 +298,17 @@ export default function Hero() {
                 id="hero-headline"
                 className="text-[40px] font-semibold leading-[1.1] tracking-tight text-ink lg:text-[64px]"
               >
-                Your wardrobe,{" "}
-                <span className="text-primary">looked after.</span>
+                {headline.map((word, i) => (
+                  <span
+                    key={i}
+                    className={cn(
+                      word.teal && "text-primary",
+                      i < headline.length - 1 && "mr-[0.28em]",
+                    )}
+                  >
+                    {word.text}
+                  </span>
+                ))}
               </h1>
             ) : (
               <motion.h1
@@ -309,14 +318,14 @@ export default function Hero() {
                 initial={false}
                 animate={entrance ? "animate" : undefined}
               >
-                {HEADLINE_WORDS.map((word, i) => (
+                {headline.map((word, i) => (
                   <motion.span
                     key={i}
                     variants={entrance ? wordReveal : undefined}
                     className={cn(
                       "inline-block",
                       word.teal && "text-primary",
-                      i < HEADLINE_WORDS.length - 1 && "mr-[0.28em]",
+                      i < headline.length - 1 && "mr-[0.28em]",
                     )}
                   >
                     {word.text}
@@ -329,35 +338,40 @@ export default function Hero() {
               className="text-lg leading-relaxed text-body lg:text-xl"
               variants={entrance ? fadeUp : undefined}
             >
-              Order laundry or tailoring in seconds. Track every garment in real
-              time. Pay when it&apos;s done.
+              {subcopy}
             </motion.p>
 
             <motion.div
               className="flex flex-wrap items-center justify-center gap-3 lg:justify-start"
               variants={entrance ? fadeUp : undefined}
             >
-              <Link
-                href="#download"
-                className="inline-flex h-11 items-center justify-center rounded-full bg-primary px-6 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-soft"
+              <NeonBorder
+                variant="fill"
+                className="w-auto"
+                innerClassName="inline-flex h-11 items-center justify-center px-6 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-soft"
               >
-                Get the App
-              </Link>
-              <Link
-                href="#provider"
-                className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-hairline px-6 text-sm font-medium text-ink transition-colors hover:border-hairline-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-soft"
+                <Link href="#download" className="inline-flex h-full items-center">
+                  Get the App
+                </Link>
+              </NeonBorder>
+              <NeonBorder
+                variant="outline"
+                className="w-auto"
+                innerClassName="inline-flex h-11 items-center justify-center gap-1.5 px-6 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-soft"
               >
-                For Providers
-                <ArrowRight className="size-4" />
-              </Link>
+                <Link href="#provider" className="inline-flex h-full items-center gap-1.5">
+                  For Providers
+                  <ArrowRight className="size-4" />
+                </Link>
+              </NeonBorder>
             </motion.div>
 
             <motion.div
               className="flex flex-wrap items-center justify-center gap-2 lg:justify-start"
               variants={entrance ? fadeUp : undefined}
             >
-              <span className="text-sm text-mute">Trusted in 12+ cities</span>
-              {CITY_CHIPS.map((city) => (
+              <span className="text-sm text-mute">{cityLabel}</span>
+              {cities.map((city) => (
                 <span
                   key={city}
                   className="inline-flex h-7 items-center rounded-full border border-hairline bg-surface-card px-3 text-xs text-body"
@@ -382,8 +396,8 @@ export default function Hero() {
             />
 
             <HeroPhone
-              src={HERO_CUSTOMER}
-              alt="Perfect Stitch customer app"
+              src={customerSrc}
+              alt={customerAlt}
               tilt={-8}
               priority
               className="w-[140px] sm:w-[160px] lg:w-[200px]"
@@ -394,8 +408,8 @@ export default function Hero() {
             />
 
             <HeroPhone
-              src={HERO_PROVIDER}
-              alt="Perfect Stitch provider app"
+              src={providerSrc}
+              alt={providerAlt}
               tilt={6}
               priority
               className="w-[140px] sm:w-[160px] lg:w-[200px]"

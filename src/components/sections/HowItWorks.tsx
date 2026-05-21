@@ -5,6 +5,10 @@ import { useMotionReady } from "@/lib/use-motion-ready";
 import { cn } from "@/lib/cn";
 import Eyebrow from "@/components/site/Eyebrow";
 import { fadeUp, revealUp, stagger, VIEWPORT } from "@/lib/motion";
+import {
+  CUSTOMER_STEP_TONES,
+  PROVIDER_STEP_TONES,
+} from "@/lib/card-tones";
 
 interface Step {
   num: string;
@@ -15,9 +19,16 @@ interface Step {
 interface HowItWorksProps {
   eyebrow: string;
   steps: readonly Step[];
+  variant?: "customer" | "provider";
 }
 
-export default function HowItWorks({ eyebrow, steps }: HowItWorksProps) {
+export default function HowItWorks({
+  eyebrow,
+  steps,
+  variant = "customer",
+}: HowItWorksProps) {
+  const tones =
+    variant === "provider" ? PROVIDER_STEP_TONES : CUSTOMER_STEP_TONES;
   const { motionEnabled } = useMotionReady();
 
   return (
@@ -38,27 +49,37 @@ export default function HowItWorks({ eyebrow, steps }: HowItWorksProps) {
         whileInView={motionEnabled ? "animate" : undefined}
         viewport={VIEWPORT}
       >
-        {steps.map((step) => (
-          <motion.article
-            key={step.num}
-            variants={motionEnabled ? fadeUp : undefined}
-            whileHover={
-              motionEnabled
-                ? { y: -4, transition: { duration: 0.25 } }
-                : undefined
-            }
-            className={cn(
-              "flex w-full max-w-[280px] flex-col gap-4 rounded-card border border-hairline bg-surface-elevated p-8",
-              "mx-auto sm:max-w-none lg:mx-0",
-            )}
-          >
-            <span className="text-5xl font-semibold leading-none text-primary md:text-6xl">
-              {step.num}
-            </span>
-            <h3 className="text-xl font-semibold text-ink">{step.title}</h3>
-            <p className="text-sm leading-relaxed text-body">{step.body}</p>
-          </motion.article>
-        ))}
+        {steps.map((step, i) => {
+          const tone = tones[i % tones.length];
+          return (
+            <motion.article
+              key={step.num}
+              variants={motionEnabled ? fadeUp : undefined}
+              whileHover={
+                motionEnabled
+                  ? { y: -4, transition: { duration: 0.25 } }
+                  : undefined
+              }
+              className={cn(
+                "relative flex w-full max-w-[280px] flex-col gap-4 overflow-hidden rounded-card border bg-gradient-to-br to-surface-elevated p-8",
+                tone.wash,
+                tone.border,
+                "mx-auto sm:max-w-none lg:mx-0",
+              )}
+            >
+              <span
+                className={cn(
+                  "text-5xl font-semibold leading-none md:text-6xl",
+                  tone.num,
+                )}
+              >
+                {step.num}
+              </span>
+              <h3 className="text-xl font-semibold text-ink">{step.title}</h3>
+              <p className="text-sm leading-relaxed text-body">{step.body}</p>
+            </motion.article>
+          );
+        })}
       </motion.div>
     </div>
   );

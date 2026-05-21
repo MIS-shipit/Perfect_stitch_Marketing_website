@@ -58,7 +58,7 @@ export default function ContactPage() {
       <Container>
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-20">
           {/* Left — Contact info */}
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-8 rounded-card border border-hairline/40 bg-surface/40 p-8 md:p-10">
             <ContactInfoRow
               icon={Mail}
               label="Support"
@@ -84,7 +84,7 @@ export default function ContactPage() {
           </div>
 
           {/* Right — ContactForm */}
-          <div>
+          <div className="rounded-card border border-hairline/40 bg-primary/[0.04] p-8 md:p-10">
             <h2 className="mb-6 text-xl font-semibold text-ink">Send us a message</h2>
             <ContactForm />
           </div>

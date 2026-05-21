@@ -3,11 +3,14 @@
 import { motion } from "framer-motion";
 import { useMotionReady } from "@/lib/use-motion-ready";
 import MockupGrid, { type MockupItem } from "@/components/marketing/MockupGrid";
-import ImageShowcaseCard, { type ShowcaseImage } from "@/components/marketing/ImageShowcaseCard";
+import ImageShowcaseCard, {
+  type ShowcaseStep,
+} from "@/components/marketing/ImageShowcaseCard";
 import Container from "@/components/site/Container";
 import Eyebrow from "@/components/site/Eyebrow";
 import HowItWorks from "@/components/sections/HowItWorks";
 import { revealUp, stagger, VIEWPORT } from "@/lib/motion";
+import { PROVIDER_MOCKUP_TONES } from "@/lib/card-tones";
 
 const PROVIDER_STEPS = [
   {
@@ -27,41 +30,12 @@ const PROVIDER_STEPS = [
   },
 ] as const;
 
-const SHOWCASE_IMAGES: ShowcaseImage[] = [
-  { src: "/mockups/_placeholder/provider-dashboard.png",    alt: "Provider dashboard",       caption: "Offline-first dashboard" },
-  { src: "/mockups/_placeholder/provider-pipeline.png",     alt: "Order pipeline screen",    caption: "Order pipeline" },
-  { src: "/mockups/_placeholder/provider-measurements.png", alt: "Measurements screen",      caption: "Measurements & intake" },
-  { src: "/mockups/_placeholder/provider-payouts.png",      alt: "Payouts screen",           caption: "Payouts & earnings" },
-];
+type ProviderProps = {
+  showcaseSteps: ShowcaseStep[];
+  cards: MockupItem[];
+};
 
-const CARDS: MockupItem[] = [
-  {
-    title: "Offline-first dashboard",
-    body: "The provider app works without an internet connection. Every action queues locally and syncs automatically the moment you're back online.",
-    mockup: { src: "/mockups/_placeholder/provider-dashboard.png", alt: "Provider dashboard" },
-    tag: "Dashboard",
-  },
-  {
-    title: "Measurements & laundry intake",
-    body: "Record precise tailoring measurements and log laundry items in seconds. Structured intake keeps every order accurate from the start.",
-    mockup: { src: "/mockups/_placeholder/provider-measurements.png", alt: "Measurements screen" },
-    tag: "Intake",
-  },
-  {
-    title: "Order pipeline & status updates",
-    body: "Move orders through your pipeline with one tap. Status badges update customers in real time — no calls needed.",
-    mockup: { src: "/mockups/_placeholder/provider-pipeline.png", alt: "Order pipeline screen" },
-    tag: "Pipeline",
-  },
-  {
-    title: "Payouts & earnings",
-    body: "Track your daily earnings, view settlement history, and receive Razorpay payouts directly to your bank account.",
-    mockup: { src: "/mockups/_placeholder/provider-payouts.png", alt: "Payouts screen" },
-    tag: "Payouts",
-  },
-];
-
-export default function Provider() {
+export default function Provider({ showcaseSteps, cards }: ProviderProps) {
   const { motionEnabled } = useMotionReady();
 
   return (
@@ -87,15 +61,19 @@ export default function Provider() {
         <div className="mt-12">
           <ImageShowcaseCard
             eyebrow="The provider app"
-            title="Everything your shop needs, even offline."
-            body="Manage orders, measurements, and payouts from one dashboard — syncs automatically the moment you're back online."
-            images={SHOWCASE_IMAGES}
+            marketingTitle="Everything your shop needs, even offline."
+            marketingBody="Manage orders, measurements, and payouts from one dashboard — syncs automatically the moment you're back online."
+            steps={showcaseSteps}
           />
         </div>
 
-        <MockupGrid items={CARDS} accent="rgb(99 102 241 / 0.18)" />
+        <MockupGrid items={cards} tones={PROVIDER_MOCKUP_TONES} />
 
-        <HowItWorks eyebrow="How it works for shops" steps={PROVIDER_STEPS} />
+        <HowItWorks
+          eyebrow="How it works for shops"
+          steps={PROVIDER_STEPS}
+          variant="provider"
+        />
       </Container>
     </section>
   );

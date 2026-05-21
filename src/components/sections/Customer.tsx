@@ -3,18 +3,14 @@
 import { motion } from "framer-motion";
 import { useMotionReady } from "@/lib/use-motion-ready";
 import MockupGrid, { type MockupItem } from "@/components/marketing/MockupGrid";
-import ImageShowcaseCard from "@/components/marketing/ImageShowcaseCard";
+import ImageShowcaseCard, {
+  type ShowcaseStep,
+} from "@/components/marketing/ImageShowcaseCard";
 import Container from "@/components/site/Container";
 import Eyebrow from "@/components/site/Eyebrow";
 import HowItWorks from "@/components/sections/HowItWorks";
 import { revealUp, stagger, VIEWPORT } from "@/lib/motion";
-
-const SHOWCASE_IMAGES = [
-  { src: "/mockups/_placeholder/customer-home.png",     alt: "Customer home screen",       caption: "Home — services at a glance" },
-  { src: "/mockups/_placeholder/customer-tracking.png", alt: "Order tracking screen",      caption: "Live order tracking" },
-  { src: "/mockups/_placeholder/customer-payment.png",  alt: "Payment confirmation",       caption: "Razorpay-secured payment" },
-  { src: "/mockups/_placeholder/customer-profile.png",  alt: "Profile and history screen", caption: "Profile, addresses, history" },
-];
+import { CUSTOMER_MOCKUP_TONES } from "@/lib/card-tones";
 
 const CUSTOMER_STEPS = [
   {
@@ -34,34 +30,12 @@ const CUSTOMER_STEPS = [
   },
 ] as const;
 
-const CARDS: MockupItem[] = [
-  {
-    title: "Browse + book in seconds",
-    body: "Pick your service, drop a pin for pickup, and confirm. A nearby provider accepts within minutes — no calls, no queues.",
-    mockup: { src: "/mockups/_placeholder/customer-home.png", alt: "Customer home screen" },
-    tag: "Booking",
-  },
-  {
-    title: "Real-time order tracking",
-    body: "Follow every step of your order — from pickup to delivery — with a live timeline and in-app chat with your provider.",
-    mockup: { src: "/mockups/_placeholder/customer-tracking.png", alt: "Order tracking screen" },
-    tag: "Tracking",
-  },
-  {
-    title: "Secure Razorpay payments",
-    body: "Pay only when your order is ready. Razorpay-backed checkout with invoice confirmation — your card details stay off our servers.",
-    mockup: { src: "/mockups/_placeholder/customer-payment.png", alt: "Payment screen" },
-    tag: "Payments",
-  },
-  {
-    title: "Profile, addresses & history",
-    body: "Save multiple addresses, reorder past items, and switch between English, Hindi, and Tamil — all from your profile.",
-    mockup: { src: "/mockups/_placeholder/customer-profile.png", alt: "Profile and history screen" },
-    tag: "Profile",
-  },
-];
+type CustomerProps = {
+  showcaseSteps: ShowcaseStep[];
+  cards: MockupItem[];
+};
 
-export default function Customer() {
+export default function Customer({ showcaseSteps, cards }: CustomerProps) {
   const { motionEnabled } = useMotionReady();
 
   return (
@@ -87,15 +61,19 @@ export default function Customer() {
         <div className="mt-12">
           <ImageShowcaseCard
             eyebrow="The customer app"
-            title="One app for every step of your laundry & tailoring journey."
-            body="From booking pickup to tracking delivery and paying securely — Perfect Stitch keeps your wardrobe under your fingertips."
-            images={SHOWCASE_IMAGES}
+            marketingTitle="One app for every step of your laundry & tailoring journey."
+            marketingBody="From booking pickup to tracking delivery and paying securely — Perfect Stitch keeps your wardrobe under your fingertips."
+            steps={showcaseSteps}
           />
         </div>
 
-        <MockupGrid items={CARDS} accent="rgb(20 184 184 / 0.18)" />
+        <MockupGrid items={cards} tones={CUSTOMER_MOCKUP_TONES} />
 
-        <HowItWorks eyebrow="How it works for customers" steps={CUSTOMER_STEPS} />
+        <HowItWorks
+          eyebrow="How it works for customers"
+          steps={CUSTOMER_STEPS}
+          variant="customer"
+        />
       </Container>
     </section>
   );

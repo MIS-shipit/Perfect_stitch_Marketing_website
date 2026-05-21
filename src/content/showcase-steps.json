@@ -1,0 +1,62 @@
+{
+  "customer": [
+    {
+      "key": "customer-home",
+      "caption": "Home — services",
+      "title": "Services & pickup booking",
+      "body": "Browse laundry, dry clean, and tailoring in one place. Pin pickup with Places, pick a slot, and confirm — no phone calls.",
+      "services": ["Laundry · Dry clean · Tailoring", "Google Places pickup pin", "Scheduled pickup slots", "EN / HI / TA interface"]
+    },
+    {
+      "key": "customer-tracking",
+      "caption": "Live tracking",
+      "title": "Real-time order timeline",
+      "body": "Every garment status updates on a live timeline — from shop intake to out for delivery.",
+      "services": ["Step-by-step order pipeline", "Push notifications", "In-app chat with shop", "Map ETA when on the way"]
+    },
+    {
+      "key": "customer-payment",
+      "caption": "Razorpay checkout",
+      "title": "Secure payments",
+      "body": "Pay when your order is ready via Razorpay — UPI, cards, and wallets. Card data never touches our servers.",
+      "services": ["Razorpay native checkout", "Pay on delivery option", "Invoice confirmation", "PCI handled by Razorpay"]
+    },
+    {
+      "key": "customer-profile",
+      "caption": "Profile & history",
+      "title": "Account & preferences",
+      "body": "Saved addresses, order history, and quick reorders — plus language and notification controls.",
+      "services": ["Multiple saved addresses", "Order history & reorder", "English · Hindi · Tamil", "Notification preferences"]
+    }
+  ],
+  "provider": [
+    {
+      "key": "provider-dashboard",
+      "caption": "Dashboard",
+      "title": "Offline-first shop dashboard",
+      "body": "Room-backed local store with WorkManager sync — accept and update orders even when connectivity drops.",
+      "services": ["Room + WorkManager sync", "Offline action queue", "Order inbox & filters", "Shop profile & hours"]
+    },
+    {
+      "key": "provider-pipeline",
+      "caption": "Order pipeline",
+      "title": "Status pipeline",
+      "body": "Move orders through your shop pipeline in one tap. Customers see every update in real time.",
+      "services": ["Custom status stages", "Batch status updates", "Customer push sync", "Priority & overdue flags"]
+    },
+    {
+      "key": "provider-measurements",
+      "caption": "Measurements",
+      "title": "Intake & measurements",
+      "body": "Structured tailoring measurements and laundry item logging at intake — fewer mistakes, faster handoff.",
+      "services": ["Measurement templates", "Garment tagging", "Laundry item checklist", "Photo notes at intake"]
+    },
+    {
+      "key": "provider-payouts",
+      "caption": "Payouts",
+      "title": "Earnings & settlements",
+      "body": "Daily earnings, settlement history, and Razorpay payouts straight to your registered bank account.",
+      "services": ["Razorpay settlement rail", "Daily earnings summary", "Payout history export", "Order-level fee breakdown"]
+    }
+  ]
+}

@@ -33,7 +33,7 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col bg-canvas font-sans text-ink">
         <MotionProvider>
           <Nav />
-          <main className="flex flex-1 flex-col overflow-x-hidden">{children}</main>
+          <main className="flex flex-1 flex-col overflow-x-clip">{children}</main>
           <Footer />
           <Toaster />
         </MotionProvider>

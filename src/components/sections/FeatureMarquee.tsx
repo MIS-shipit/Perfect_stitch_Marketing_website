@@ -4,17 +4,6 @@ import { motion } from "framer-motion";
 import { useMotionReady } from "@/lib/use-motion-ready";
 import { fadeUp, VIEWPORT } from "@/lib/motion";
 
-const ITEMS = [
-  "Book pickup",
-  "Real-time tracking",
-  "Razorpay payments",
-  "Multi-language",
-  "Offline-first",
-  "Measurements",
-  "Order pipeline",
-  "Payouts",
-];
-
 function MarqueeTrack({ items }: { items: string[] }) {
   const { motionEnabled } = useMotionReady();
 
@@ -41,7 +30,11 @@ function MarqueeTrack({ items }: { items: string[] }) {
   );
 }
 
-export default function FeatureMarquee() {
+type FeatureMarqueeProps = {
+  items: string[];
+};
+
+export default function FeatureMarquee({ items }: FeatureMarqueeProps) {
   const { motionEnabled } = useMotionReady();
 
   return (
@@ -70,13 +63,13 @@ export default function FeatureMarquee() {
 
       <div className="flex overflow-hidden">
         {/* Two tracks for seamless loop */}
-        <MarqueeTrack items={ITEMS} />
-        <MarqueeTrack items={ITEMS} />
+        <MarqueeTrack items={items} />
+        <MarqueeTrack items={items} />
       </div>
 
       {/* Accessible static list for screen readers */}
       <ul className="sr-only">
-        {ITEMS.map((item) => (
+        {items.map((item) => (
           <li key={item}>{item}</li>
         ))}
       </ul>

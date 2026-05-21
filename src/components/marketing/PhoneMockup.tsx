@@ -7,6 +7,8 @@ interface PhoneMockupProps {
   tilt?: number;
   priority?: boolean;
   className?: string;
+  screenLabel?: string;
+  screenGradient?: string;
 }
 
 function isPlaceholder(src: string) {
@@ -25,6 +27,8 @@ export default function PhoneMockup({
   tilt = 0,
   priority = false,
   className,
+  screenLabel,
+  screenGradient = "from-surface-elevated to-surface",
 }: PhoneMockupProps) {
   return (
     <div
@@ -71,11 +75,18 @@ export default function PhoneMockup({
           sizes="(max-width: 768px) 40vw, 280px"
         />
         {isPlaceholder(src) && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-surface-elevated/60">
-            <div className="h-1 w-12 rounded-full bg-hairline-strong" />
-            <span className="mt-2 text-[11px] text-mute/60">
-              Placeholder
-            </span>
+          <div
+            className={cn(
+              "absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-b px-4 text-center",
+              screenGradient,
+            )}
+          >
+            <div className="h-1 w-10 rounded-full bg-primary/40" />
+            {screenLabel ? (
+              <span className="text-[11px] font-medium text-primary/80">
+                {screenLabel}
+              </span>
+            ) : null}
           </div>
         )}
       </div>

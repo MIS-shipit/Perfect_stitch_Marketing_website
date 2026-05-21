@@ -207,13 +207,67 @@ section[id] {
   animation: neon-pulse 3s ease-in-out infinite;
 }
 
+/* ── Neon border (CTA + showcase cards) ── */
+@keyframes neon-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.neon-border {
+  padding: 1px;
+}
+
+.neon-border-orbit {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgb(20 184 184 / 0.05) 40deg,
+    rgb(20 184 184 / 0.85) 120deg,
+    rgb(20 184 184 / 0.25) 200deg,
+    transparent 280deg,
+    rgb(20 184 184 / 0.7) 320deg,
+    transparent 360deg
+  );
+  animation: neon-orbit 5s linear infinite;
+}
+
+.neon-border-spot {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    220px circle at var(--spot-x) var(--spot-y),
+    rgb(20 184 184 / 0.95),
+    rgb(20 184 184 / 0.35) 28%,
+    transparent 52%
+  );
+  opacity: 0.9;
+  mix-blend-mode: screen;
+}
+
+.neon-border-inner {
+  box-shadow: inset 0 0 0 1px rgb(20 184 184 / 0.12);
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto !important;
   }
 
   .dot-grid-animated,
-  .qr-card-neon {
+  .qr-card-neon,
+  .neon-border-orbit {
     animation: none !important;
+  }
+
+  .neon-border-spot {
+    opacity: 0.35;
   }
 }

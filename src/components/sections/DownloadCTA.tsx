@@ -7,12 +7,12 @@ import Container from "@/components/site/Container";
 import { useMotionReady } from "@/lib/use-motion-ready";
 import { fadeUp, revealUp, stagger, VIEWPORT } from "@/lib/motion";
 
-const PLAY_URL =
-  process.env.NEXT_PUBLIC_PLAY_URL ?? "https://play.google.com/store/apps";
-const APPLE_URL =
-  process.env.NEXT_PUBLIC_APPLE_URL ?? "https://apps.apple.com";
+type DownloadCTAProps = {
+  playUrl: string;
+  appleUrl: string;
+};
 
-export default function DownloadCTA() {
+export default function DownloadCTA({ playUrl, appleUrl }: DownloadCTAProps) {
   const { motionEnabled } = useMotionReady();
 
   return (
@@ -52,8 +52,8 @@ export default function DownloadCTA() {
           <QRCard
             playSrc="/qr/play.png"
             appleSrc="/qr/apple.png"
-            playUrl={PLAY_URL}
-            appleUrl={APPLE_URL}
+            playUrl={playUrl}
+            appleUrl={appleUrl}
           />
         </motion.div>
       </Container>

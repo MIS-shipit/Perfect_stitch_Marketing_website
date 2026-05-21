@@ -14,12 +14,19 @@ export interface MockupItem {
   tag?: string;
 }
 
+type MockupTone = {
+  glow: string;
+  border: string;
+  tag: string;
+  screen: string;
+};
+
 interface MockupCardProps {
   item: MockupItem;
-  accent?: string;
+  tone: MockupTone;
 }
 
-function MockupCard({ item, accent = "var(--color-primary-soft)" }: MockupCardProps) {
+function MockupCard({ item, tone }: MockupCardProps) {
   const { motionEnabled } = useMotionReady();
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -38,18 +45,24 @@ function MockupCard({ item, accent = "var(--color-primary-soft)" }: MockupCardPr
       whileHover={
         motionEnabled ? { y: -6, transition: { duration: 0.3, ease: EASE } } : undefined
       }
-      className="group relative overflow-hidden rounded-3xl border border-hairline bg-surface-elevated"
+      className={cn(
+        "group relative overflow-hidden rounded-3xl border bg-surface-elevated",
+        tone.border,
+      )}
     >
       <div
-        className="relative flex items-end justify-center overflow-hidden bg-surface"
+        className={cn(
+          "relative flex items-end justify-center overflow-hidden bg-gradient-to-b",
+          tone.screen,
+        )}
         style={{ minHeight: 300 }}
       >
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 transition-opacity duration-500 group-hover:opacity-100"
           style={{
-            background: `radial-gradient(ellipse at 50% 110%, ${accent}, transparent 60%)`,
-            opacity: 0.85,
+            background: `radial-gradient(ellipse at 50% 110%, ${tone.glow}, transparent 60%)`,
+            opacity: 0.9,
           }}
         />
 
@@ -70,6 +83,8 @@ function MockupCard({ item, accent = "var(--color-primary-soft)" }: MockupCardPr
             src={item.mockup.src}
             alt={item.mockup.alt}
             className="w-[130px] sm:w-[150px]"
+            screenLabel={item.tag ?? item.title}
+            screenGradient={tone.screen}
           />
         </motion.div>
 
@@ -124,10 +139,10 @@ function MockupCard({ item, accent = "var(--color-primary-soft)" }: MockupCardPr
 
 interface MockupGridProps {
   items: readonly MockupItem[];
-  accent?: string;
+  tones: readonly MockupTone[];
 }
 
-export default function MockupGrid({ items, accent }: MockupGridProps) {
+export default function MockupGrid({ items, tones }: MockupGridProps) {
   const { motionEnabled } = useMotionReady();
   const col1 = items.filter((_, i) => i % 2 === 0);
   const col2 = items.filter((_, i) => i % 2 === 1);
@@ -141,15 +156,29 @@ export default function MockupGrid({ items, accent }: MockupGridProps) {
       viewport={VIEWPORT}
     >
       <div className="flex flex-col gap-5 sm:gap-6 lg:gap-8">
-        {col1.map((item) => (
-          <MockupCard key={item.title} item={item} accent={accent} />
-        ))}
+        {col1.map((item, i) => {
+          const idx = i * 2;
+          return (
+            <MockupCard
+              key={item.title}
+              item={item}
+              tone={tones[idx] ?? tones[0]}
+            />
+          );
+        })}
       </div>
 
       <div className="flex flex-col gap-5 sm:mt-20 sm:gap-6 lg:mt-28 lg:gap-8">
-        {col2.map((item) => (
-          <MockupCard key={item.title} item={item} accent={accent} />
-        ))}
+        {col2.map((item, i) => {
+          const idx = i * 2 + 1;
+          return (
+            <MockupCard
+              key={item.title}
+              item={item}
+              tone={tones[idx] ?? tones[0]}
+            />
+          );
+        })}
       </div>
     </motion.div>
   );
