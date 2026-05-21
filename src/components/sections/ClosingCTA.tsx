@@ -5,7 +5,7 @@ import { useMotionReady } from "@/lib/use-motion-ready";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import Container from "@/components/site/Container";
-import { fadeUp, stagger, EASE } from "@/lib/motion";
+import { fadeUp, stagger, EASE, VIEWPORT } from "@/lib/motion";
 
 const STATS = [
   { value: "1K+", label: "Orders monthly" },
@@ -17,7 +17,7 @@ const STATS = [
 const TRUST_TEXT = "Razorpay-secured · Real-time tracking · Offline-ready";
 
 export default function ClosingCTA() {
-  const { animate, reduced } = useMotionReady();
+  const { motionEnabled, reduced } = useMotionReady();
 
   return (
     <section
@@ -30,22 +30,21 @@ export default function ClosingCTA() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse at 50% 60%, var(--color-primary-soft), transparent 65%)",
+            "radial-gradient(ellipse at 50% 60%, rgb(20 184 184 / 0.20), transparent 65%)",
         }}
       />
 
       <Container className="relative z-10">
         <motion.div
           className="flex max-w-2xl flex-col items-center gap-8 text-center mx-auto"
-          variants={animate ? stagger(0.1) : undefined}
-          initial={animate ? "initial" : false}
-          whileInView={animate ? "animate" : undefined}
-          viewport={{ once: true, margin: "-60px" }}
+          variants={motionEnabled ? stagger(0.1) : undefined}
+          initial={motionEnabled ? "initial" : false}
+          whileInView={motionEnabled ? "animate" : undefined}
+          viewport={VIEWPORT}
         >
-          {/* Headline */}
           <motion.h2
             className="text-4xl font-semibold leading-[1.15] text-ink md:text-5xl"
-            variants={animate ? fadeUp : undefined}
+            variants={motionEnabled ? fadeUp : undefined}
           >
             Ready to stitch your routine?
           </motion.h2>
@@ -53,7 +52,7 @@ export default function ClosingCTA() {
           {/* Subtitle */}
           <motion.p
             className="text-lg leading-relaxed text-body lg:text-xl"
-            variants={animate ? fadeUp : undefined}
+            variants={motionEnabled ? fadeUp : undefined}
           >
             Download Perfect Stitch and get your first pickup scheduled in under
             a minute.
@@ -62,7 +61,7 @@ export default function ClosingCTA() {
           {/* CTA buttons */}
           <motion.div
             className="flex flex-wrap items-center justify-center gap-3"
-            variants={animate ? fadeUp : undefined}
+            variants={motionEnabled ? fadeUp : undefined}
           >
             <Link
               href="#"
@@ -82,7 +81,7 @@ export default function ClosingCTA() {
           {/* Stat chips */}
           <motion.div
             className="flex flex-wrap items-center justify-center gap-3"
-            variants={animate ? fadeUp : undefined}
+            variants={motionEnabled ? fadeUp : undefined}
           >
             {STATS.map((stat) => (
               <span
@@ -98,7 +97,7 @@ export default function ClosingCTA() {
           {/* Trust line — delayed entrance */}
           <motion.p
             className="text-sm text-mute"
-            variants={animate ? fadeUp : undefined}
+            variants={motionEnabled ? fadeUp : undefined}
             transition={
               reduced
                 ? undefined

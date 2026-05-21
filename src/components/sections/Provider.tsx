@@ -1,13 +1,13 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { useMotionReady } from "@/lib/use-motion-ready";
 import MockupGrid, { type MockupItem } from "@/components/marketing/MockupGrid";
-import ImageShowcaseCard from "@/components/marketing/ImageShowcaseCard";
+import ImageShowcaseCard, { type ShowcaseImage } from "@/components/marketing/ImageShowcaseCard";
 import Container from "@/components/site/Container";
 import Eyebrow from "@/components/site/Eyebrow";
 import HowItWorks from "@/components/sections/HowItWorks";
+import { revealUp, stagger, VIEWPORT } from "@/lib/motion";
 
 const PROVIDER_STEPS = [
   {
@@ -26,6 +26,13 @@ const PROVIDER_STEPS = [
     body: "Mark orders complete and receive Razorpay settlements directly to your bank account.",
   },
 ] as const;
+
+const SHOWCASE_IMAGES: ShowcaseImage[] = [
+  { src: "/mockups/_placeholder/provider-dashboard.png",    alt: "Provider dashboard",       caption: "Offline-first dashboard" },
+  { src: "/mockups/_placeholder/provider-pipeline.png",     alt: "Order pipeline screen",    caption: "Order pipeline" },
+  { src: "/mockups/_placeholder/provider-measurements.png", alt: "Measurements screen",      caption: "Measurements & intake" },
+  { src: "/mockups/_placeholder/provider-payouts.png",      alt: "Payouts screen",           caption: "Payouts & earnings" },
+];
 
 const CARDS: MockupItem[] = [
   {
@@ -55,28 +62,37 @@ const CARDS: MockupItem[] = [
 ];
 
 export default function Provider() {
-  const { animate } = useMotionReady();
-  const sectionRef = useRef<HTMLElement>(null);
-
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "start 0.35"],
-  });
-
-  const headerY = useTransform(scrollYProgress, [0, 1], [20, 0]);
-  const headerOpacity = useTransform(scrollYProgress, [0, 0.5], [0, 1]);
+  const { motionEnabled } = useMotionReady();
 
   return (
-    <section ref={sectionRef} id="provider" className="py-12 md:py-16 lg:py-24">
+    <section id="provider" className="py-12 md:py-16 lg:py-24">
       <Container>
-        <motion.div style={animate ? { y: headerY, opacity: headerOpacity } : undefined}>
-          <Eyebrow>For Shops</Eyebrow>
-          <h2 className="mt-4 text-4xl font-semibold leading-[1.15] text-ink md:text-5xl">
+        <motion.div
+          variants={motionEnabled ? stagger(0.12) : undefined}
+          initial={motionEnabled ? "initial" : false}
+          whileInView={motionEnabled ? "animate" : undefined}
+          viewport={VIEWPORT}
+        >
+          <motion.div variants={motionEnabled ? revealUp : undefined}>
+            <Eyebrow>For Shops</Eyebrow>
+          </motion.div>
+          <motion.h2
+            variants={motionEnabled ? revealUp : undefined}
+            className="mt-4 text-4xl font-semibold leading-[1.15] text-ink md:text-5xl"
+          >
             Run your shop like the back-office it should be.
-          </h2>
+          </motion.h2>
         </motion.div>
 
-        {/* Staggered 2-col mockup grid */}
+        <div className="mt-12">
+          <ImageShowcaseCard
+            eyebrow="The provider app"
+            title="Everything your shop needs, even offline."
+            body="Manage orders, measurements, and payouts from one dashboard — syncs automatically the moment you're back online."
+            images={SHOWCASE_IMAGES}
+          />
+        </div>
+
         <MockupGrid items={CARDS} accent="rgb(99 102 241 / 0.18)" />
 
         <HowItWorks eyebrow="How it works for shops" steps={PROVIDER_STEPS} />

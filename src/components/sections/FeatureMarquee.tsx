@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useMotionReady } from "@/lib/use-motion-ready";
+import { fadeUp, VIEWPORT } from "@/lib/motion";
 
 const ITEMS = [
   "Book pickup",
@@ -15,16 +16,16 @@ const ITEMS = [
 ];
 
 function MarqueeTrack({ items }: { items: string[] }) {
-  const { animate } = useMotionReady();
+  const { motionEnabled } = useMotionReady();
 
   return (
     <motion.ul
       className="flex shrink-0 items-center gap-0"
       aria-hidden
       initial={false}
-      animate={animate ? { x: ["0%", "-50%"] } : undefined}
+      animate={motionEnabled ? { x: ["0%", "-50%"] } : false}
       transition={
-        animate ? { duration: 30, ease: "linear", repeat: Infinity } : undefined
+        motionEnabled ? { duration: 30, ease: "linear", repeat: Infinity } : undefined
       }
     >
       {/* Duplicate twice so -50% always has content */}
@@ -41,8 +42,16 @@ function MarqueeTrack({ items }: { items: string[] }) {
 }
 
 export default function FeatureMarquee() {
+  const { motionEnabled } = useMotionReady();
+
   return (
-    <div className="relative overflow-hidden border-y border-hairline bg-surface py-5">
+    <motion.div
+      className="relative overflow-hidden border-y border-hairline bg-surface py-5"
+      variants={motionEnabled ? fadeUp : undefined}
+      initial={motionEnabled ? "initial" : false}
+      whileInView={motionEnabled ? "animate" : undefined}
+      viewport={VIEWPORT}
+    >
       {/* Edge-fade mask */}
       <div
         aria-hidden
@@ -71,6 +80,6 @@ export default function FeatureMarquee() {
           <li key={item}>{item}</li>
         ))}
       </ul>
-    </div>
+    </motion.div>
   );
 }

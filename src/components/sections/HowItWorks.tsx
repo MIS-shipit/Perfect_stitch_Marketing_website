@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useMotionReady } from "@/lib/use-motion-ready";
 import { cn } from "@/lib/cn";
 import Eyebrow from "@/components/site/Eyebrow";
-import { fadeUp, stagger } from "@/lib/motion";
+import { fadeUp, revealUp, stagger, VIEWPORT } from "@/lib/motion";
 
 interface Step {
   num: string;
@@ -18,22 +18,35 @@ interface HowItWorksProps {
 }
 
 export default function HowItWorks({ eyebrow, steps }: HowItWorksProps) {
-  const { animate } = useMotionReady();
+  const { motionEnabled } = useMotionReady();
 
   return (
-    <div className="border-t border-hairline pt-16 mt-16">
-      <Eyebrow>{eyebrow}</Eyebrow>
+    <div className="mt-16 border-t border-hairline pt-16">
+      <motion.div
+        variants={motionEnabled ? revealUp : undefined}
+        initial={motionEnabled ? "initial" : false}
+        whileInView={motionEnabled ? "animate" : undefined}
+        viewport={VIEWPORT}
+      >
+        <Eyebrow>{eyebrow}</Eyebrow>
+      </motion.div>
+
       <motion.div
         className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8"
-        variants={animate ? stagger(0.1) : undefined}
-        initial={animate ? "initial" : false}
-        whileInView={animate ? "animate" : undefined}
-        viewport={{ once: true, margin: "-80px" }}
+        variants={motionEnabled ? stagger(0.12) : undefined}
+        initial={motionEnabled ? "initial" : false}
+        whileInView={motionEnabled ? "animate" : undefined}
+        viewport={VIEWPORT}
       >
         {steps.map((step) => (
           <motion.article
             key={step.num}
-            variants={animate ? fadeUp : undefined}
+            variants={motionEnabled ? fadeUp : undefined}
+            whileHover={
+              motionEnabled
+                ? { y: -4, transition: { duration: 0.25 } }
+                : undefined
+            }
             className={cn(
               "flex w-full max-w-[280px] flex-col gap-4 rounded-card border border-hairline bg-surface-elevated p-8",
               "mx-auto sm:max-w-none lg:mx-0",

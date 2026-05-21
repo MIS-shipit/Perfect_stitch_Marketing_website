@@ -5,7 +5,7 @@ import { useMotionReady } from "@/lib/use-motion-ready";
 import { cn } from "@/lib/cn";
 import Container from "./Container";
 import Eyebrow from "./Eyebrow";
-import { revealUp, stagger } from "@/lib/motion";
+import { revealUp, stagger, VIEWPORT } from "@/lib/motion";
 
 interface SectionProps {
   id?: string;
@@ -24,7 +24,7 @@ export default function Section({
   className,
   containerClassName,
 }: SectionProps) {
-  const { animate } = useMotionReady();
+  const { motionEnabled } = useMotionReady();
   const hasHeader = Boolean(eyebrow || title);
 
   return (
@@ -32,19 +32,19 @@ export default function Section({
       <Container className={containerClassName}>
         {hasHeader && (
           <motion.div
-            variants={animate ? stagger(0.1) : undefined}
-            initial={animate ? "initial" : false}
-            whileInView={animate ? "animate" : undefined}
-            viewport={{ once: true, margin: "-60px" }}
+            variants={motionEnabled ? stagger(0.1) : undefined}
+            initial={motionEnabled ? "initial" : false}
+            whileInView={motionEnabled ? "animate" : undefined}
+            viewport={VIEWPORT}
           >
             {eyebrow && (
-              <motion.div variants={animate ? revealUp : undefined}>
+              <motion.div variants={motionEnabled ? revealUp : undefined}>
                 <Eyebrow>{eyebrow}</Eyebrow>
               </motion.div>
             )}
             {title && (
               <motion.h2
-                variants={animate ? revealUp : undefined}
+                variants={motionEnabled ? revealUp : undefined}
                 className={cn(
                   "text-4xl font-semibold leading-[1.15] text-ink md:text-5xl",
                   eyebrow && "mt-4",

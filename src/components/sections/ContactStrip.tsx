@@ -1,8 +1,13 @@
+"use client";
+
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { Handshake, Mail } from "lucide-react";
 import Container from "@/components/site/Container";
 import { cn } from "@/lib/cn";
+import { useMotionReady } from "@/lib/use-motion-ready";
+import { fadeUp, stagger, VIEWPORT } from "@/lib/motion";
 
 function SocialIcon({
   className,
@@ -69,14 +74,22 @@ const SOCIALS = [
 ] as const;
 
 export default function ContactStrip() {
+  const { motionEnabled } = useMotionReady();
+
   return (
     <section
       className="border-t border-hairline bg-surface py-12"
       aria-label="Contact and social"
     >
       <Container>
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-8">
-          <div className="flex flex-col gap-3">
+        <motion.div
+          className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-8"
+          variants={motionEnabled ? stagger(0.1) : undefined}
+          initial={motionEnabled ? "initial" : false}
+          whileInView={motionEnabled ? "animate" : undefined}
+          viewport={VIEWPORT}
+        >
+          <motion.div variants={motionEnabled ? fadeUp : undefined} className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
               <Mail className="size-5 shrink-0 text-body" aria-hidden />
               <h3 className="text-sm font-medium text-ink">Support</h3>
@@ -87,9 +100,9 @@ export default function ContactStrip() {
             >
               support@perfectstitch.online
             </a>
-          </div>
+          </motion.div>
 
-          <div className="flex flex-col gap-3">
+          <motion.div variants={motionEnabled ? fadeUp : undefined} className="flex flex-col gap-3">
             <div className="flex items-center gap-2">
               <Handshake className="size-5 shrink-0 text-body" aria-hidden />
               <h3 className="text-sm font-medium text-ink">Partner with us</h3>
@@ -100,9 +113,9 @@ export default function ContactStrip() {
             >
               partner@perfectstitch.online
             </a>
-          </div>
+          </motion.div>
 
-          <div className="flex flex-col gap-3">
+          <motion.div variants={motionEnabled ? fadeUp : undefined} className="flex flex-col gap-3">
             <h3 className="text-sm font-medium text-ink">Follow</h3>
             <div className="flex flex-wrap gap-2">
               {SOCIALS.map(({ label, href, icon: Icon }) => (
@@ -118,8 +131,8 @@ export default function ContactStrip() {
                 </Link>
               ))}
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </Container>
     </section>
   );

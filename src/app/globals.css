@@ -125,7 +125,7 @@ section[id] {
 
 /* ── Utility: dot-grid texture ── */
 .dot-grid {
-  background-image: radial-gradient(circle, rgb(255 255 255 / 0.18) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgb(255 255 255 / 0.22) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
@@ -136,14 +136,28 @@ section[id] {
 }
 
 @keyframes dot-breathe {
-  0%, 100% { opacity: 0.45; }
-  50%       { opacity: 0.7; }
+  0%, 100% { opacity: 0.55; }
+  50%       { opacity: 1; }
 }
 
+/*
+ * Hero dot grid — base layer; Hero.tsx adds Framer wander + parallax on top.
+ * Fallback CSS animation when JS motion is disabled.
+ */
 .dot-grid-animated {
-  background-image: radial-gradient(circle, rgb(255 255 255 / 0.22) 1px, transparent 1px);
-  background-size: 32px 32px;
-  animation: dot-drift 14s linear infinite, dot-breathe 7s ease-in-out infinite;
+  background-image: radial-gradient(circle, rgb(255 255 255 / 0.32) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mix-blend-mode: screen;
+  animation: dot-breathe 5s ease-in-out infinite;
+}
+
+@keyframes dot-wander {
+  0%   { background-position: 0px 0px; }
+  20%  { background-position: 18px -12px; }
+  40%  { background-position: -14px 20px; }
+  60%  { background-position: 22px 10px; }
+  80%  { background-position: -8px -16px; }
+  100% { background-position: 0px 0px; }
 }
 
 /* ── Utility: section reveal keyframe ── */
@@ -194,12 +208,12 @@ section[id] {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+  html {
     scroll-behavior: auto !important;
+  }
+
+  .dot-grid-animated,
+  .qr-card-neon {
+    animation: none !important;
   }
 }

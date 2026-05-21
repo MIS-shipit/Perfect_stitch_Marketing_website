@@ -28,7 +28,7 @@ export default function FeatureRow({
   accentLink,
   delay = 0,
 }: FeatureRowProps) {
-  const { animate } = useMotionReady();
+  const { motionEnabled, ready } = useMotionReady();
   const tiltDeg = imageSide === "left" ? -4 : 4;
   const mockupVariants = tiltIn(tiltDeg);
 
@@ -42,11 +42,11 @@ export default function FeatureRow({
       {/* Mockup — tiltIn enter + micro hover scale */}
       <motion.div
         className="w-full max-w-[260px] shrink-0 lg:max-w-[300px]"
-        variants={animate ? mockupVariants : undefined}
-        initial={animate ? "initial" : false}
-        whileInView={animate ? "animate" : undefined}
-        whileHover={animate ? { scale: 1.005 } : undefined}
-        viewport={{ once: true, margin: "-80px" }}
+        variants={motionEnabled ? mockupVariants : undefined}
+        initial={ready && motionEnabled ? "initial" : false}
+        whileInView={motionEnabled ? "animate" : undefined}
+        whileHover={motionEnabled ? { scale: 1.005 } : undefined}
+        viewport={{ once: true, margin: "-60px", amount: 0.2 }}
         transition={{ duration: 0.8, ease: EASE, delay }}
       >
         <PhoneMockup src={mockup.src} alt={mockup.alt} />
@@ -55,10 +55,10 @@ export default function FeatureRow({
       {/* Copy — slideReveal with per-row stagger delay */}
       <motion.div
         className="flex flex-col gap-4"
-        variants={animate ? slideReveal : undefined}
-        initial={animate ? "initial" : false}
-        whileInView={animate ? "animate" : undefined}
-        viewport={{ once: true, margin: "-80px" }}
+        variants={motionEnabled ? slideReveal : undefined}
+        initial={ready && motionEnabled ? "initial" : false}
+        whileInView={motionEnabled ? "animate" : undefined}
+        viewport={{ once: true, margin: "-60px", amount: 0.2 }}
         transition={{ duration: 0.7, ease: EASE, delay }}
       >
         {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}

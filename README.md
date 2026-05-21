@@ -1,30 +1,48 @@
-# Perfect Stitch — Marketing Website
+# Perfect Stitch — Marketing Web
 
-Public marketing site for Perfect Stitch (Next.js 16, App Router, Tailwind v4, shadcn/ui).
+Next.js 16 marketing site (public landing, about, contact). Lives in the monorepo under `marketing-web/`.
 
-**Repository:** [MIS-shipit/Perfect_stitch_Marketing_website](https://github.com/MIS-shipit/Perfect_stitch_Marketing_website)
+## Git branch
 
-## Development
+- **Branch:** `marketing-web` (based on `main`, one commit ahead with this folder)
+- **Dedicated worktree:** `D:\Office\Moozz\Perfect-Stitch-marketing-web` — use this for marketing-only work without touching `webadmin` / mobile changes
+- **Push:** `git push -u origin marketing-web` (from the worktree or main repo after `git checkout marketing-web`)
+
+## Vercel (monorepo)
+
+Import the repo, set **Root Directory** to `marketing-web`, framework Next.js. See `.env.example` for contact form env vars.
+
+## Getting Started
+
+First, run the development server:
 
 ```bash
-npm install
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Build
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-```bash
-npm run build
-npm start
-```
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
 ## Deploy on Vercel
 
-1. Import [Perfect_stitch_Marketing_website](https://github.com/MIS-shipit/Perfect_stitch_Marketing_website) in Vercel.
-2. **Root Directory:** `.` (repo root — not a monorepo subfolder).
-3. **Framework:** Next.js (auto-detected).
-4. Set env vars from `.env.example` (`CONTACT_PROVIDER`, `RESEND_API_KEY` or `FORMSPREE_ENDPOINT`, `NEXT_PUBLIC_SITE_URL`, store URLs).
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Design tokens and stack details: `DESIGN.md`.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

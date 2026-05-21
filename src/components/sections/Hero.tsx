@@ -1,17 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useMotionValue, useTransform } from "framer-motion";
-import { useEffect, useRef } from "react";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  useScroll,
+  useSpring,
+} from "framer-motion";
+import { useEffect, useRef, type RefObject } from "react";
 import { useMotionReady } from "@/lib/use-motion-ready";
 import { ArrowRight } from "lucide-react";
 import PhoneMockup from "@/components/marketing/PhoneMockup";
 import Eyebrow from "@/components/site/Eyebrow";
 import Container from "@/components/site/Container";
 import { cn } from "@/lib/cn";
-import { fadeUp, stagger, wordReveal } from "@/lib/motion";
+import { EASE, fadeUp, stagger, wordReveal } from "@/lib/motion";
 
-// TODO: replace with real Compose screenshots
 const HERO_CUSTOMER = "/mockups/_placeholder/hero-customer.png";
 const HERO_PROVIDER = "/mockups/_placeholder/hero-provider.png";
 
@@ -22,7 +27,6 @@ const FLOAT_ANIMATION = {
   transition: { duration: 6, repeat: Infinity, ease: "easeInOut" as const },
 };
 
-// Word segments: text + whether it's teal-colored
 const HEADLINE_WORDS: { text: string; teal: boolean }[] = [
   { text: "Your", teal: false },
   { text: "wardrobe,", teal: false },
@@ -30,16 +34,132 @@ const HEADLINE_WORDS: { text: string; teal: boolean }[] = [
   { text: "after.", teal: true },
 ];
 
+const SPRING = { stiffness: 120, damping: 22, mass: 0.4 };
+
+interface HeroPhoneProps {
+  src: string;
+  alt: string;
+  tilt: number;
+  priority?: boolean;
+  className?: string;
+  entrance: boolean;
+  motionEnabled: boolean;
+  entranceDelay: number;
+  floatDelay?: number;
+  sectionRef: RefObject<HTMLElement | null>;
+}
+
+function HeroPhone({
+  src,
+  alt,
+  tilt,
+  priority,
+  className,
+  entrance,
+  motionEnabled,
+  entranceDelay,
+  floatDelay = 0,
+  sectionRef,
+}: HeroPhoneProps) {
+  const phoneRef = useRef<HTMLDivElement>(null);
+  const proximity = useMotionValue(0);
+  const popScale = useTransform(proximity, [0, 1], [1, 1.07]);
+  const popY = useTransform(proximity, [0, 1], [0, -14]);
+
+  useEffect(() => {
+    if (!motionEnabled) return;
+
+    const section = sectionRef.current;
+    if (!section) return;
+
+    const onMove = (e: MouseEvent) => {
+      const el = phoneRef.current;
+      if (!el) return;
+
+      const rect = el.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = e.clientX - cx;
+      const dy = e.clientY - cy;
+      const dist = Math.hypot(dx, dy);
+      const radius = Math.max(rect.width, rect.height) * 1.4;
+      proximity.set(Math.max(0, 1 - dist / radius));
+    };
+
+    const onLeave = () => proximity.set(0);
+
+    section.addEventListener("mousemove", onMove);
+    section.addEventListener("mouseleave", onLeave);
+    return () => {
+      section.removeEventListener("mousemove", onMove);
+      section.removeEventListener("mouseleave", onLeave);
+    };
+  }, [motionEnabled, proximity, sectionRef]);
+
+  return (
+    <motion.div
+      ref={phoneRef}
+      initial={entrance ? { opacity: 0, y: 32 } : false}
+      animate={
+        motionEnabled
+          ? {
+              opacity: 1,
+              y: 0,
+              transition: {
+                duration: 0.8,
+                delay: entrance ? entranceDelay : 0,
+                ease: EASE,
+              },
+            }
+          : undefined
+      }
+    >
+      <motion.div
+        style={motionEnabled ? { scale: popScale, y: popY } : undefined}
+        whileHover={
+          motionEnabled
+            ? { scale: 1.05, y: -10, transition: { duration: 0.25 } }
+            : undefined
+        }
+      >
+        <motion.div
+          animate={
+            motionEnabled
+              ? {
+                  ...FLOAT_ANIMATION,
+                  transition: {
+                    ...FLOAT_ANIMATION.transition,
+                    delay: floatDelay,
+                  },
+                }
+              : undefined
+          }
+        >
+          <PhoneMockup
+            src={src}
+            alt={alt}
+            tilt={tilt}
+            priority={priority}
+            className={className}
+          />
+        </motion.div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 export default function Hero() {
-  const { animate } = useMotionReady();
-  const reduceMotion = !animate;
+  const { entrance, motionEnabled, ready } = useMotionReady();
+  const enhancedMotion = ready && motionEnabled;
   const sectionRef = useRef<HTMLElement>(null);
 
   const mouseX = useMotionValue(0.5);
   const mouseY = useMotionValue(0.5);
+  const smoothX = useSpring(mouseX, SPRING);
+  const smoothY = useSpring(mouseY, SPRING);
 
   useEffect(() => {
-    if (reduceMotion) return;
+    if (!enhancedMotion) return;
 
     const el = sectionRef.current;
     if (!el) return;
@@ -50,17 +170,41 @@ export default function Hero() {
       mouseY.set((e.clientY - rect.top) / rect.height);
     };
 
-    el.addEventListener("mousemove", onMove);
-    return () => el.removeEventListener("mousemove", onMove);
-  }, [reduceMotion, mouseX, mouseY]);
+    const onLeave = () => {
+      mouseX.set(0.5);
+      mouseY.set(0.5);
+    };
 
-  const glowX = useTransform(mouseX, [0, 1], ["0%", "100%"]);
-  const glowY = useTransform(mouseY, [0, 1], ["0%", "100%"]);
-  const cursorGlow = useTransform(
+    el.addEventListener("mousemove", onMove);
+    el.addEventListener("mouseleave", onLeave);
+    return () => {
+      el.removeEventListener("mousemove", onMove);
+      el.removeEventListener("mouseleave", onLeave);
+    };
+  }, [enhancedMotion, mouseX, mouseY]);
+
+  const glowX = useTransform(smoothX, [0, 1], ["0%", "100%"]);
+  const glowY = useTransform(smoothY, [0, 1], ["0%", "100%"]);
+
+  const cursorSpotlight = useTransform(
     [glowX, glowY],
     ([x, y]) =>
-      `radial-gradient(ellipse at ${x} ${y}, rgb(20 184 184 / 0.13), transparent 60%)`,
+      `radial-gradient(600px circle at ${x} ${y}, rgb(20 184 184 / 0.22), rgb(20 184 184 / 0.06) 35%, transparent 65%)`,
   );
+
+  const cursorCore = useTransform(
+    [glowX, glowY],
+    ([x, y]) =>
+      `radial-gradient(280px circle at ${x} ${y}, rgb(20 184 184 / 0.14), transparent 70%)`,
+  );
+
+  const dotParallaxX = useTransform(smoothX, [0, 1], [-18, 18]);
+  const dotParallaxY = useTransform(smoothY, [0, 1], [-18, 18]);
+
+  const { scrollY } = useScroll();
+  const contentY = useTransform(scrollY, [0, 600], [0, -70]);
+  const contentOpacity = useTransform(scrollY, [0, 450], [1, 0]);
+  const phonesY = useTransform(scrollY, [0, 600], [0, -40]);
 
   return (
     <section
@@ -68,33 +212,34 @@ export default function Hero() {
       className="relative flex min-h-[calc(100svh-4rem)] items-center overflow-hidden bg-canvas py-24"
       aria-labelledby="hero-headline"
     >
-      {/* Layer 1 — animated dot-grid texture */}
-      <div
-        aria-hidden
-        className="dot-grid-animated pointer-events-none absolute inset-0 z-0"
-      />
-
-      {/* Layer 2 — static ambient teal glow (always-on, centered) */}
+      {/* Ambient base glow */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 z-0"
         style={{
           background:
-            "radial-gradient(ellipse at 50% 40%, var(--color-primary-soft), transparent 65%)",
+            "radial-gradient(ellipse at 50% 40%, rgb(20 184 184 / 0.16), transparent 65%)",
         }}
       />
 
-      {/* Layer 3 — cursor-follow glow (disabled in reduced-motion) */}
-      {!reduceMotion ? (
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 z-0"
-          style={{ background: cursorGlow }}
-        />
+      {/* Cursor-follow spotlight — spring-smoothed (client-only after mount) */}
+      {enhancedMotion ? (
+        <>
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-[1]"
+            style={{ background: cursorSpotlight }}
+          />
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-[1]"
+            style={{ background: cursorCore }}
+          />
+        </>
       ) : (
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 z-0"
+          className="pointer-events-none absolute inset-0 z-[1]"
           style={{
             background:
               "radial-gradient(ellipse at 50% 40%, rgb(20 184 184 / 0.12), transparent 65%)",
@@ -102,21 +247,53 @@ export default function Hero() {
         />
       )}
 
+      {/* Dot grid — organic wander + mouse parallax (client-only after mount) */}
+      {enhancedMotion ? (
+        <motion.div
+          aria-hidden
+          className="dot-grid-animated pointer-events-none absolute inset-[-40px] z-[2]"
+          style={{ x: dotParallaxX, y: dotParallaxY }}
+          animate={{
+            backgroundPosition: [
+              "0px 0px",
+              "18px -12px",
+              "-14px 20px",
+              "22px 10px",
+              "-8px -16px",
+              "0px 0px",
+            ],
+          }}
+          transition={{
+            duration: 24,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        />
+      ) : (
+        <div
+          aria-hidden
+          className="dot-grid pointer-events-none absolute inset-0 z-[2] opacity-50"
+        />
+      )}
+
       <Container className="relative z-10">
         <div className="flex flex-col items-center gap-16 lg:flex-row lg:items-center lg:gap-12">
-          {/* ── Copy ── */}
           <motion.div
             className="flex max-w-xl flex-col items-center gap-6 text-center lg:items-start lg:text-left"
-            variants={animate ? stagger(0.08) : undefined}
-            initial={animate ? "initial" : false}
-            animate={animate ? "animate" : undefined}
+            variants={entrance ? stagger(0.08) : undefined}
+            initial={false}
+            animate={entrance ? "animate" : undefined}
+            style={
+              enhancedMotion
+                ? { y: contentY, opacity: contentOpacity }
+                : undefined
+            }
           >
-            <motion.div variants={animate ? fadeUp : undefined}>
+            <motion.div variants={entrance ? fadeUp : undefined}>
               <Eyebrow>LAUNDRY + TAILORING · ON-DEMAND</Eyebrow>
             </motion.div>
 
-            {/* Headline — per-word stagger in full-motion; static fallback in reduced-motion */}
-            {reduceMotion ? (
+            {!entrance ? (
               <h1
                 id="hero-headline"
                 className="text-[40px] font-semibold leading-[1.1] tracking-tight text-ink lg:text-[64px]"
@@ -128,12 +305,14 @@ export default function Hero() {
               <motion.h1
                 id="hero-headline"
                 className="text-[40px] font-semibold leading-[1.1] tracking-tight text-ink lg:text-[64px]"
-                variants={animate ? stagger(0.05) : undefined}
+                variants={entrance ? stagger(0.05) : undefined}
+                initial={false}
+                animate={entrance ? "animate" : undefined}
               >
                 {HEADLINE_WORDS.map((word, i) => (
                   <motion.span
                     key={i}
-                    variants={animate ? wordReveal : undefined}
+                    variants={entrance ? wordReveal : undefined}
                     className={cn(
                       "inline-block",
                       word.teal && "text-primary",
@@ -148,7 +327,7 @@ export default function Hero() {
 
             <motion.p
               className="text-lg leading-relaxed text-body lg:text-xl"
-              variants={animate ? fadeUp : undefined}
+              variants={entrance ? fadeUp : undefined}
             >
               Order laundry or tailoring in seconds. Track every garment in real
               time. Pay when it&apos;s done.
@@ -156,7 +335,7 @@ export default function Hero() {
 
             <motion.div
               className="flex flex-wrap items-center justify-center gap-3 lg:justify-start"
-              variants={animate ? fadeUp : undefined}
+              variants={entrance ? fadeUp : undefined}
             >
               <Link
                 href="#download"
@@ -173,10 +352,9 @@ export default function Hero() {
               </Link>
             </motion.div>
 
-            {/* Trust row */}
             <motion.div
               className="flex flex-wrap items-center justify-center gap-2 lg:justify-start"
-              variants={animate ? fadeUp : undefined}
+              variants={entrance ? fadeUp : undefined}
             >
               <span className="text-sm text-mute">Trusted in 12+ cities</span>
               {CITY_CHIPS.map((city) => (
@@ -190,84 +368,44 @@ export default function Hero() {
             </motion.div>
           </motion.div>
 
-          {/* ── Mockups ── */}
-          <div className="relative flex shrink-0 items-end justify-center gap-4 lg:gap-6">
-            {/* Ring glow behind phones — radial from bottom center */}
+          <motion.div
+            className="relative flex shrink-0 items-end justify-center gap-4 lg:gap-6"
+            style={enhancedMotion ? { y: phonesY } : undefined}
+          >
             <div
               aria-hidden
               className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-4/5"
               style={{
                 background:
-                  "radial-gradient(ellipse at 50% 100%, var(--color-primary-soft), transparent 70%)",
+                  "radial-gradient(ellipse at 50% 100%, rgb(20 184 184 / 0.22), transparent 70%)",
               }}
             />
 
-            <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: 32 }}
-              animate={
-                reduceMotion
-                  ? {}
-                  : {
-                      opacity: 1,
-                      y: 0,
-                      transition: {
-                        duration: 0.8,
-                        delay: 0.3,
-                        ease: [0.16, 1, 0.3, 1],
-                      },
-                    }
-              }
-            >
-              <motion.div animate={reduceMotion ? {} : FLOAT_ANIMATION}>
-                <PhoneMockup
-                  src={HERO_CUSTOMER}
-                  alt="Perfect Stitch customer app"
-                  tilt={-8}
-                  priority
-                  className="w-[140px] sm:w-[160px] lg:w-[200px]"
-                />
-              </motion.div>
-            </motion.div>
+            <HeroPhone
+              src={HERO_CUSTOMER}
+              alt="Perfect Stitch customer app"
+              tilt={-8}
+              priority
+              className="w-[140px] sm:w-[160px] lg:w-[200px]"
+              entrance={entrance}
+              motionEnabled={enhancedMotion}
+              entranceDelay={0.3}
+              sectionRef={sectionRef}
+            />
 
-            <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: 48 }}
-              animate={
-                reduceMotion
-                  ? {}
-                  : {
-                      opacity: 1,
-                      y: 0,
-                      transition: {
-                        duration: 0.8,
-                        delay: 0.45,
-                        ease: [0.16, 1, 0.3, 1],
-                      },
-                    }
-              }
-            >
-              <motion.div
-                animate={
-                  reduceMotion
-                    ? {}
-                    : {
-                        ...FLOAT_ANIMATION,
-                        transition: {
-                          ...FLOAT_ANIMATION.transition,
-                          delay: 1.5,
-                        },
-                      }
-                }
-              >
-                <PhoneMockup
-                  src={HERO_PROVIDER}
-                  alt="Perfect Stitch provider app"
-                  tilt={6}
-                  priority
-                  className="w-[140px] sm:w-[160px] lg:w-[200px]"
-                />
-              </motion.div>
-            </motion.div>
-          </div>
+            <HeroPhone
+              src={HERO_PROVIDER}
+              alt="Perfect Stitch provider app"
+              tilt={6}
+              priority
+              className="w-[140px] sm:w-[160px] lg:w-[200px]"
+              entrance={entrance}
+              motionEnabled={enhancedMotion}
+              entranceDelay={0.45}
+              floatDelay={1.5}
+              sectionRef={sectionRef}
+            />
+          </motion.div>
         </div>
       </Container>
     </section>

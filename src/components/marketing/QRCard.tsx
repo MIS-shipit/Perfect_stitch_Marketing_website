@@ -1,9 +1,9 @@
 "use client";
 
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useInView } from "framer-motion";
 import { cn } from "@/lib/cn";
 import { EASE } from "@/lib/motion";
 import { useMotionReady } from "@/lib/use-motion-ready";
@@ -19,6 +19,7 @@ interface QRCardProps {
 
 // Official-style Play Store icon — colorful gradient triangle
 function PlayStoreIcon({ className }: { className?: string }) {
+  const gid = "ps-grad-qr";
   return (
     <svg
       aria-hidden
@@ -28,13 +29,13 @@ function PlayStoreIcon({ className }: { className?: string }) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
-        <linearGradient id="ps-grad" x1="4" y1="2" x2="20" y2="22" gradientUnits="userSpaceOnUse">
+        <linearGradient id={gid} x1="4" y1="2" x2="20" y2="22" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#00CFE8" />
           <stop offset="45%" stopColor="#01CA7C" />
           <stop offset="100%" stopColor="#FFD740" />
         </linearGradient>
       </defs>
-      <path d="M4.5 2.8 19.2 12 4.5 21.2V2.8Z" fill="url(#ps-grad)" />
+      <path d="M4.5 2.8 19.2 12 4.5 21.2V2.8Z" fill={`url(#${gid})`} />
     </svg>
   );
 }
@@ -69,17 +70,24 @@ const STORE_META: Record<Store, { eyebrow: string; label: string; ariaLabel: str
 
 export default function QRCard({ playSrc, appleSrc, playUrl, appleUrl }: QRCardProps) {
   const [active, setActive] = useState<Store>("play");
-  const { animate } = useMotionReady();
+  const { motionEnabled, entrance } = useMotionReady();
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
 
   const qrSrc = active === "play" ? playSrc : appleSrc;
-  const storeUrl = active === "play" ? playUrl : appleUrl;
+
+  const visible = !motionEnabled || inView || entrance;
 
   return (
     <motion.div
-      initial={animate ? { opacity: 0, y: 24 } : false}
-      whileInView={animate ? { opacity: 1, y: 0 } : undefined}
+      ref={ref}
+      initial={false}
+      animate={
+        motionEnabled && !visible
+          ? { opacity: 0, y: 24 }
+          : { opacity: 1, y: 0 }
+      }
       transition={{ duration: 0.6, ease: EASE }}
-      viewport={{ once: true, margin: "-80px" }}
       className="qr-card-neon flex flex-col items-center gap-7 rounded-[28px] border border-primary/20 bg-surface-elevated p-8"
     >
       {/* Store toggle */}
@@ -131,9 +139,9 @@ export default function QRCard({ playSrc, appleSrc, playUrl, appleUrl }: QRCardP
           <AnimatePresence mode="wait">
             <motion.div
               key={active}
-              initial={animate ? { opacity: 0, scale: 0.95 } : false}
+              initial={motionEnabled ? { opacity: 0, scale: 0.95 } : false}
               animate={{ opacity: 1, scale: 1, transition: { duration: 0.22, ease: "easeOut" } }}
-              exit={animate ? { opacity: 0, scale: 0.95, transition: { duration: 0.15, ease: "easeIn" } } : undefined}
+              exit={motionEnabled ? { opacity: 0, scale: 0.95, transition: { duration: 0.15, ease: "easeIn" } } : undefined}
               className="absolute inset-0"
             >
               <Image

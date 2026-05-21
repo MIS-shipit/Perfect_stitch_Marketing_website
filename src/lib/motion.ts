@@ -31,3 +31,18 @@ export const tiltIn = (deg: number): Variants => ({
   initial: { opacity: 0, y: 40, rotate: deg * 1.2 },
   animate: { opacity: 1, y: 0, rotate: deg, transition: { duration: 0.8, ease: EASE } },
 });
+
+/** Shared viewport config for scroll-triggered reveals */
+export const VIEWPORT = { once: true, margin: "-60px", amount: 0.12 } as const;
+
+/** Scale + fade reveal for cards */
+export const scaleUp: Variants = {
+  initial: { opacity: 0, y: 48, scale: 0.94, filter: "blur(6px)" },
+  animate: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: { duration: 0.75, ease: EASE },
+  },
+};
