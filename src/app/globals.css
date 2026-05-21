@@ -207,7 +207,6 @@ section[id] {
   animation: neon-pulse 3s ease-in-out infinite;
 }
 
-
 /* ── Nav glass pill (scroll-compact) ── */
 .nav-glass {
   border: 1px solid rgb(255 255 255 / 0.14);
@@ -226,33 +225,49 @@ section[id] {
 }
 
 /* ── Neon border (CTA + showcase cards) ── */
-@keyframes neon-orbit {
+@property --neon-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes neon-border-trace {
   to {
-    transform: rotate(360deg);
+    --neon-angle: 360deg;
   }
 }
 
 .neon-border {
   padding: 1px;
+  isolation: isolate;
 }
 
-.neon-border-orbit {
+/* Light travels along the border ring only — no full-card spin. */
+.neon-border-trace {
   position: absolute;
   inset: 0;
   z-index: 0;
-  overflow: hidden;
   pointer-events: none;
+  border-radius: inherit;
+  padding: 1px;
   background: conic-gradient(
-    from 0deg,
+    from var(--neon-angle),
     transparent 0deg,
-    rgb(20 184 184 / 0.05) 40deg,
-    rgb(20 184 184 / 0.85) 120deg,
-    rgb(20 184 184 / 0.25) 200deg,
-    transparent 280deg,
-    rgb(20 184 184 / 0.7) 320deg,
+    transparent 248deg,
+    rgb(20 184 184 / 0.12) 288deg,
+    rgb(20 184 184 / 0.95) 318deg,
+    rgb(20 184 184 / 0.45) 338deg,
     transparent 360deg
   );
-  animation: neon-orbit 5s linear infinite;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  animation: neon-border-trace 4.5s linear infinite;
 }
 
 .neon-border-spot {
@@ -260,18 +275,96 @@ section[id] {
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  border-radius: inherit;
+  padding: 1px;
   background: radial-gradient(
-    220px circle at var(--spot-x) var(--spot-y),
+    180px circle at var(--spot-x) var(--spot-y),
     rgb(20 184 184 / 0.95),
-    rgb(20 184 184 / 0.35) 28%,
-    transparent 52%
+    rgb(20 184 184 / 0.35) 32%,
+    transparent 56%
   );
-  opacity: 0.9;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0.85;
   mix-blend-mode: screen;
 }
 
 .neon-border-inner {
-  box-shadow: inset 0 0 0 1px rgb(20 184 184 / 0.12);
+  box-shadow: inset 0 0 0 1px rgb(20 184 184 / 0.1);
+}
+
+/* Showcase card — subtle dark gradient with slow wandering light */
+.neon-border-ambient-base,
+.neon-border-ambient-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.neon-border-ambient-base {
+  background: linear-gradient(
+    115deg,
+    #121820 0%,
+    #1a2430 38%,
+    #0f1419 72%,
+    #162028 100%
+  );
+  background-size: 240% 240%;
+  animation: neon-ambient-drift 22s ease-in-out infinite;
+}
+
+.neon-border-ambient-glow {
+  background:
+    radial-gradient(
+      ellipse 90% 70% at 20% 30%,
+      rgb(20 184 184 / 0.07),
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 70% 55% at 80% 70%,
+      rgb(30 58 80 / 0.1),
+      transparent 60%
+    );
+  background-size: 200% 200%;
+  animation: neon-ambient-glow 16s ease-in-out infinite alternate;
+}
+
+@keyframes neon-ambient-drift {
+  0% {
+    background-position: 0% 40%;
+  }
+  25% {
+    background-position: 70% 10%;
+  }
+  50% {
+    background-position: 100% 60%;
+  }
+  75% {
+    background-position: 30% 90%;
+  }
+  100% {
+    background-position: 0% 40%;
+  }
+}
+
+@keyframes neon-ambient-glow {
+  0% {
+    background-position: 0% 0%, 100% 100%;
+  }
+  50% {
+    background-position: 100% 50%, 0% 0%;
+  }
+  100% {
+    background-position: 40% 100%, 80% 20%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -281,11 +374,18 @@ section[id] {
 
   .dot-grid-animated,
   .qr-card-neon,
-  .neon-border-orbit {
+  .neon-border-trace,
+  .neon-border-ambient-base,
+  .neon-border-ambient-glow {
     animation: none !important;
   }
 
   .neon-border-spot {
     opacity: 0.35;
+  }
+
+  .neon-border-ambient-base {
+    background-size: 100% 100%;
+    background-position: 50% 50%;
   }
 }

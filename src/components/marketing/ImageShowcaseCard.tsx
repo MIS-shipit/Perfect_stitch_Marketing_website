@@ -151,7 +151,9 @@ function ShowcasePanel({
     <NeonBorder
       className="w-full"
       radius="1.5rem"
-      innerClassName="overflow-hidden border-0 bg-surface-elevated p-0 shadow-none"
+      ambient
+      spotlight={false}
+      innerClassName="overflow-hidden border-0 bg-transparent p-0 shadow-none"
     >
       <motion.article
         className="relative overflow-hidden bg-transparent"
@@ -160,15 +162,6 @@ function ShowcasePanel({
         viewport={VIEWPORT}
         transition={{ duration: 0.7, ease: EASE }}
       >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse at 20% 0%, var(--color-primary-soft), transparent 55%)",
-        }}
-      />
-
       <div className="relative z-10 grid grid-cols-1 gap-6 p-6 md:p-8 lg:grid-cols-[1fr_1.35fr] lg:items-stretch lg:gap-10 lg:p-10">
         <div className="flex flex-col gap-4">
           {eyebrow ? (
